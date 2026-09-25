@@ -54,11 +54,16 @@ export function toApiError(error: unknown): ApiError {
     if (status === undefined) {
       return new ApiError("offline", "Can't reach dummyjson.com. Check your connection.");
     }
+
+    // DummyJSON rejects a bad token with 500 {"message":"invalid token"} and
+    // only uses 401 when the header is missing altogether, so the message is
+    // more reliable than the status code for spotting an auth failure.
+    const blamesTheToken = /token|authoriz/i.test(serverMessage ?? "");
+    if (status === 401 || status === 403 || blamesTheToken) {
+      return new ApiError("unauthorized", serverMessage ?? "Your session has expired.", status);
+    }
     if (status === 400) {
       return new ApiError("credentials", serverMessage ?? "The request was rejected.", status);
-    }
-    if (status === 401 || status === 403) {
-      return new ApiError("unauthorized", serverMessage ?? "Your session has expired.", status);
     }
     if (status === 404) {
       return new ApiError("not-found", serverMessage ?? "Not found.", status);

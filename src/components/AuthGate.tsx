@@ -1,18 +1,23 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { fetchCurrentUser } from "@/api/auth";
 import { getSession, useSession } from "@/lib/session";
+import type { ApiError } from "@/lib/api-error";
+import { isCanceled } from "@/lib/api-error";
 
 /**
- * Renders children only while a token is present, so the product pages are
- * never painted for a signed-out visitor and then yanked away. A 401 clears the
- * session from the Axios interceptor, which lands here as `token === null`.
+ * Renders children only once a token is present and the API has confirmed it,
+ * so the product pages are never painted for someone who can't actually use
+ * them. A 401 from the check clears the session in the Axios interceptor,
+ * which lands back here as `token === null`.
  */
 export function AuthGate({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { token } = useSession();
+  const [confirmed, setConfirmed] = useState(false);
   // Losing a token mid-session is an expiry; never having one is a plain visit.
   const hadToken = useRef(false);
 
@@ -31,6 +36,29 @@ export function AuthGate({ children }: { children: ReactNode }) {
     router.replace(`/login?next=${encodeURIComponent(target)}${reason}`);
   }, [token, router, pathname]);
 
-  if (!token) return null;
+  useEffect(() => {
+    if (!token) return;
+    const controller = new AbortController();
+    let current = true;
+
+    fetchCurrentUser({ signal: controller.signal })
+      .then(() => {
+        if (current) setConfirmed(true);
+      })
+      .catch((error: ApiError) => {
+        if (!current || isCanceled(error)) return;
+        // A rejected token has already cleared the session, and the effect
+        // above will redirect. Anything else — offline, a 5xx — is the API's
+        // problem, not a reason to lock someone out of a page they can read.
+        if (error.kind !== "unauthorized") setConfirmed(true);
+      });
+
+    return () => {
+      current = false;
+      controller.abort();
+    };
+  }, [token]);
+
+  if (!token || !confirmed) return null;
   return <>{children}</>;
 }

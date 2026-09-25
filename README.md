@@ -30,8 +30,10 @@ host, which is how the failure states were tested against a dead one — see `.e
 - Sign in through `POST /auth/login`; wrong details get one plain message, not a stack trace.
 - The token and user are kept in `localStorage` behind a small store that the Axios interceptor,
   the top bar and the route guard all read from.
-- `/products` and `/products/[id]` render nothing until the token is confirmed, so a signed-out
-  visitor never sees a flash of the catalogue.
+- `/products` and `/products/[id]` render nothing until the token is confirmed against
+  `GET /auth/me`, so neither a signed-out visitor nor an expired session ever sees a flash of the
+  catalogue. An expired token lands you back on the login page with an explanation, and signing in
+  returns you to the URL you were on, query string and all.
 - Sign out clears the session. Signing out in one tab signs out the others.
 
 **List**
@@ -101,10 +103,15 @@ API call. Type a word, replace it mid-flight, and the first result never lands.
 **Repeated clicks send one request.** Sign in, Save and Delete disable themselves only while a
 request is in flight, and return early if one already is.
 
+**A rejected token doesn't arrive as a 401.** DummyJSON answers a bad token with
+`500 {"message":"invalid token"}`, and only uses 401 when the header is missing entirely. The error
+mapper therefore reads the message as well as the status before deciding something is an auth
+failure — trusting the status code alone let an expired session carry on browsing.
+
 ## Known limits
 
-- The 401 branch of the interceptor signs you out and explains why on the login page, but
-  DummyJSON's product endpoints are public, so only `/auth/*` can actually trigger it.
+- Confirming the session costs one `/auth/me` request per full page load. Client-side navigation
+  inside the app doesn't repeat it.
 - Locally added products are pinned to page 1 rather than sorted into position, because their place
   in a server-sorted result set isn't knowable from one page of it.
 - Local changes live in `sessionStorage`, so they last for the tab and not beyond it.

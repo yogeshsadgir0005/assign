@@ -46,6 +46,20 @@ It's my favourite bug in the project because the symptom (pagination) was three 
 cause (auth), and because it only reproduced on a hard load — client-side navigation was fine the
 whole time.
 
+## The bug behind the bug
+
+Guarding the routes with `GET /auth/me` looked finished the moment it compiled: valid tokens got
+in. Then I set a deliberately broken token and reloaded — and the app let me straight through.
+
+DummyJSON rejects a bad token with `500 {"message":"invalid token"}`, keeping 401 for a missing
+header. My error mapper classified that as a server fault, which is the one category the guard
+treats as "the API's problem, don't lock anyone out" — so a dead session browsed on happily.
+
+The mapper now reads the message alongside the status, because a service that returns 500 for
+"your token is wrong" is describing the failure more accurately in prose than in its status line.
+Worth writing down because the code was correct against the specification and wrong against the
+server, and only trying it proved which.
+
 ## Where AI helped, and where it didn't
 
 I used Claude throughout. It was most useful for the mechanical parts: laying out the module
