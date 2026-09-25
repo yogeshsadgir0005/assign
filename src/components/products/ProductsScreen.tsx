@@ -193,7 +193,8 @@ export function ProductsScreen() {
         </p>
       ) : null}
 
-      <div className="mt-1 overflow-hidden rounded-sm border border-line bg-surface">
+      {/* No overflow-hidden here: it would trap the table's sticky header. */}
+      <div className="mt-1 rounded-sm border border-line bg-surface">
         {showSkeleton ? (
           <TableSkeleton rows={query.limit} />
         ) : showError && error ? (

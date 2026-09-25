@@ -20,7 +20,10 @@ function validate(username: string, password: string): Errors {
 export function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const next = params.get("next") ?? "/products";
+  // Only ever bounce back inside this app, never to an absolute URL someone
+  // dropped in the query string.
+  const requested = params.get("next") ?? "";
+  const next = requested.startsWith("/") && !requested.startsWith("//") ? requested : "/products";
   const expired = params.get("reason") === "expired";
 
   const [username, setUsername] = useState("");

@@ -2,18 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { clearSession, readUser } from "@/lib/session";
+import { clearSession, useSession } from "@/lib/session";
 import { Button } from "@/components/ui/Button";
-import { useEffect, useState } from "react";
 
 export function TopBar() {
   const router = useRouter();
-  const [name, setName] = useState("");
-
-  useEffect(() => {
-    const user = readUser();
-    if (user) setName(user.username);
-  }, []);
+  const { user } = useSession();
 
   function signOut() {
     clearSession();
@@ -30,7 +24,9 @@ export function TopBar() {
           Products admin
         </Link>
         <div className="flex items-center gap-3">
-          {name ? <span className="hidden text-[13px] text-ink-3 sm:inline">{name}</span> : null}
+          {user ? (
+            <span className="hidden text-[13px] text-ink-3 sm:inline">{user.username}</span>
+          ) : null}
           <Button size="sm" onClick={signOut}>
             Sign out
           </Button>

@@ -1,3 +1,7 @@
+"use client";
+
+import { useSyncExternalStore } from "react";
+
 const TOKEN_KEY = "padmin.token";
 const USER_KEY = "padmin.user";
 
@@ -9,27 +13,49 @@ export type SessionUser = {
   image: string;
 };
 
+export type Session = { token: string | null; user: SessionUser | null };
+
+const SIGNED_OUT: Session = { token: null, user: null };
+
 /**
- * Read synchronously so the route guard can decide before the first paint
- * instead of flashing the protected page and then redirecting.
+ * The session is an external store rather than component state: the Axios
+ * interceptor reads it synchronously, another tab can change it, and the route
+ * guard has to know the answer before it renders anything.
  */
-export function readToken(): string | null {
-  if (typeof window === "undefined") return null;
+let snapshot: Session = SIGNED_OUT;
+let loaded = false;
+const listeners = new Set<() => void>();
+
+function readFromStorage(): Session {
   try {
-    return window.localStorage.getItem(TOKEN_KEY);
+    const token = window.localStorage.getItem(TOKEN_KEY);
+    const rawUser = window.localStorage.getItem(USER_KEY);
+    return {
+      token,
+      user: rawUser ? (JSON.parse(rawUser) as SessionUser) : null,
+    };
   } catch {
-    return null;
+    return SIGNED_OUT;
   }
 }
 
-export function readUser(): SessionUser | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem(USER_KEY);
-    return raw ? (JSON.parse(raw) as SessionUser) : null;
-  } catch {
-    return null;
-  }
+function load() {
+  if (loaded || typeof window === "undefined") return;
+  loaded = true;
+  snapshot = readFromStorage();
+}
+
+function emit() {
+  listeners.forEach((listener) => listener());
+}
+
+export function getSession(): Session {
+  load();
+  return snapshot;
+}
+
+export function readToken(): string | null {
+  return getSession().token;
 }
 
 export function saveSession(token: string, user: SessionUser) {
@@ -37,8 +63,11 @@ export function saveSession(token: string, user: SessionUser) {
     window.localStorage.setItem(TOKEN_KEY, token);
     window.localStorage.setItem(USER_KEY, JSON.stringify(user));
   } catch {
-    // Private-mode storage failures shouldn't break the login flow.
+    // Private-mode storage failures shouldn't break the sign-in.
   }
+  loaded = true;
+  snapshot = { token, user };
+  emit();
 }
 
 export function clearSession() {
@@ -48,12 +77,34 @@ export function clearSession() {
   } catch {
     // ignore
   }
+  loaded = true;
+  snapshot = SIGNED_OUT;
+  emit();
 }
 
-export const SESSION_EXPIRED_EVENT = "padmin:session-expired";
+/** Signing out in one tab should sign out the others. */
+function onStorage(event: StorageEvent) {
+  if (event.key !== TOKEN_KEY && event.key !== USER_KEY) return;
+  snapshot = readFromStorage();
+  emit();
+}
 
-/** Fired by the Axios interceptor on a 401 so the guard can redirect once. */
+function subscribe(listener: () => void) {
+  load();
+  if (listeners.size === 0) window.addEventListener("storage", onStorage);
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+    if (listeners.size === 0) window.removeEventListener("storage", onStorage);
+  };
+}
+
+export function useSession() {
+  return useSyncExternalStore(subscribe, getSession, () => SIGNED_OUT);
+}
+
+/** Called by the Axios interceptor when the API rejects our token. */
 export function announceSessionExpired() {
+  if (!snapshot.token && loaded) return;
   clearSession();
-  window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
 }

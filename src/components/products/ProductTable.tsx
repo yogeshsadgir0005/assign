@@ -31,6 +31,14 @@ export function LocalTag({ label = "Local" }: { label?: string }) {
   );
 }
 
+/**
+ * Sticky lives on the cells, not on <thead>: a sticky <thead> with
+ * border-collapse drops its borders in Chrome and mispositions the first row.
+ */
+const headCell =
+  "sticky top-12 z-10 border-b border-line-strong bg-surface px-3 py-2 " +
+  "text-[12px] font-medium tracking-wide text-ink-3 uppercase";
+
 function SortableHeader({
   field,
   label,
@@ -48,11 +56,17 @@ function SortableHeader({
   const direction = active ? (query.order === "asc" ? "↑" : "↓") : "";
 
   return (
-    <th scope="col" className={className} aria-sort={active ? (query.order === "asc" ? "ascending" : "descending") : "none"}>
+    <th
+      scope="col"
+      className={`${headCell} ${className}`}
+      aria-sort={active ? (query.order === "asc" ? "ascending" : "descending") : "none"}
+    >
       <button
         type="button"
         onClick={() => onSort(field)}
-        className={`inline-flex items-center gap-1 py-2 hover:text-ink ${active ? "text-accent" : ""}`}
+        className={`inline-flex items-center gap-1 py-2 uppercase hover:text-ink ${
+          active ? "text-accent" : ""
+        }`}
       >
         {label}
         <span aria-hidden className="w-2 text-[11px]">
@@ -74,14 +88,14 @@ export function ProductTable({
   onDelete,
 }: Props) {
   return (
-    <table className="w-full border-collapse text-sm">
-      <thead className="sticky top-12 z-10 bg-surface text-left text-[12px] font-medium tracking-wide text-ink-3 uppercase">
-        <tr className="border-b border-line-strong">
-          <th scope="col" className="w-16 px-3 py-2 text-right">
+    <table className="w-full border-separate border-spacing-0 text-sm">
+      <thead>
+        <tr>
+          <th scope="col" className={`${headCell} w-16 text-right`}>
             Id
           </th>
-          <SortableHeader field="title" label="Product" query={query} onSort={onSort} className="px-3" />
-          <th scope="col" className="hidden w-40 px-3 py-2 lg:table-cell">
+          <SortableHeader field="title" label="Product" query={query} onSort={onSort} className="text-left" />
+          <th scope="col" className={`${headCell} hidden w-40 text-left lg:table-cell`}>
             Category
           </th>
           <SortableHeader
@@ -89,19 +103,19 @@ export function ProductTable({
             label="Price"
             query={query}
             onSort={onSort}
-            className="w-28 px-3 text-right [&>button]:flex-row-reverse [&>button]:justify-start"
+            className="w-28 text-right [&>button]:flex-row-reverse [&>button]:justify-start"
           />
           <SortableHeader
             field="rating"
             label="Rating"
             query={query}
             onSort={onSort}
-            className="w-24 px-3 text-right [&>button]:flex-row-reverse [&>button]:justify-start"
+            className="w-24 text-right [&>button]:flex-row-reverse [&>button]:justify-start"
           />
-          <th scope="col" className="w-20 px-3 py-2 text-right">
+          <th scope="col" className={`${headCell} w-20 text-right`}>
             Stock
           </th>
-          <th scope="col" className="w-28 px-3 py-2 text-right">
+          <th scope="col" className={`${headCell} w-28 text-right`}>
             <span className="sr-only">Actions</span>
           </th>
         </tr>
@@ -111,7 +125,10 @@ export function ProductTable({
         {products.map((product) => {
           const changed = changedIds.includes(product.id) || isLocalId(product.id);
           return (
-            <tr key={product.id} className="border-b border-line last:border-0 hover:bg-sunken">
+            <tr
+              key={product.id}
+              className="hover:bg-sunken [&:last-child>td]:border-0 [&>td]:border-b [&>td]:border-line"
+            >
               <td className="num px-3 py-1.5 text-right font-mono text-[13px] text-ink-3">
                 {isLocalId(product.id) ? "new" : product.id}
               </td>
