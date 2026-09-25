@@ -5,6 +5,7 @@ import type { ListQuery } from "@/api/products";
 import type { Category } from "@/types/product";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { PAGE_SIZES, SORT_OPTIONS, isFiltered, sortValue, withSortValue } from "@/lib/query";
+import { formatCategory } from "@/lib/format";
 import { controlClass } from "@/components/ui/Field";
 
 type Props = {
@@ -66,6 +67,10 @@ export function ListToolbar({ query, categories, onChange }: Props) {
           className={`${selectBase} ${query.category ? activeSelect : ""}`}
         >
           <option value="">All categories</option>
+          {/* Until the category list arrives, still show the one in the URL. */}
+          {query.category && !categories.some((item) => item.slug === query.category) ? (
+            <option value={query.category}>{formatCategory(query.category)}</option>
+          ) : null}
           {categories.map((category) => (
             <option key={category.slug} value={category.slug}>
               {category.name}

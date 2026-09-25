@@ -57,6 +57,11 @@
     outline-offset: 1px;
   }
 
+  /* A field that is both focused and wrong shouldn't look approved. */
+  [aria-invalid="true"]:focus-visible {
+    outline-color: var(--color-danger);
+  }
+
   /* The browser default ring is invisible on our warm surfaces. */
   ::selection {
     background-color: var(--color-accent-soft);

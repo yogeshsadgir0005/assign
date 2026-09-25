@@ -3,7 +3,8 @@ import { announceSessionExpired, readToken } from "./session";
 import { toApiError } from "./api-error";
 
 export const http = axios.create({
-  baseURL: "https://dummyjson.com",
+  // Overridable so the failure states can be exercised against a dead host.
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://dummyjson.com",
   timeout: 20000,
 });
 

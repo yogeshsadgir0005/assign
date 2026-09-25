@@ -50,14 +50,14 @@ export function ProductCards({ products, listSearch, busy, changedIds, onEdit, o
               <button
                 type="button"
                 onClick={() => onEdit(product)}
-                className="h-9 rounded-sm border border-line-strong bg-surface px-3 text-[13px] text-ink"
+                className="h-10 rounded-sm border border-line-strong bg-surface px-4 text-[13px] text-ink"
               >
                 Edit
               </button>
               <button
                 type="button"
                 onClick={() => onDelete(product)}
-                className="h-9 rounded-sm border border-line-strong bg-surface px-3 text-[13px] text-danger"
+                className="h-10 rounded-sm border border-line-strong bg-surface px-4 text-[13px] text-danger"
               >
                 Delete
               </button>
