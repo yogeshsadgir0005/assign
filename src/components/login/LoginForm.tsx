@@ -145,10 +145,15 @@ export function LoginForm() {
         {submitting ? "Signing in…" : "Sign in"}
       </Button>
 
-      <p className="mt-4 border-t border-line pt-3 text-[13px] text-ink-3">
-        Demo account: <span className="font-mono text-ink-2">emilys</span> /{" "}
-        <span className="font-mono text-ink-2">emilyspass</span>
-      </p>
+      <div className="mt-4 border-t border-line pt-3 text-[13px]">
+        <p className="text-ink-3">Demo account</p>
+        <dl className="mt-1 grid grid-cols-[5.5rem_1fr] gap-y-0.5">
+          <dt className="text-ink-3">Username</dt>
+          <dd className="font-mono text-ink-2">emilys</dd>
+          <dt className="text-ink-3">Password</dt>
+          <dd className="font-mono text-ink-2">emilyspass</dd>
+        </dl>
+      </div>
     </form>
   );
 }
