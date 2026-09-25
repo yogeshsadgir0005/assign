@@ -15,7 +15,7 @@ export type ListQuery = {
 
 type RequestOptions = { signal?: AbortSignal };
 
-const LIST_FIELDS = "id,title,category,price,rating,stock,thumbnail,brand";
+const LIST_FIELDS = "id,title,description,category,price,rating,stock,thumbnail,brand";
 
 /**
  * DummyJSON exposes search and category as separate endpoints — there is no
