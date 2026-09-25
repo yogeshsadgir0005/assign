@@ -15,21 +15,6 @@ export const SORT_OPTIONS: { value: string; label: string }[] = [
 
 const SORT_FIELDS: SortField[] = ["title", "price", "rating"];
 
-export const EMPTY_QUERY: ListQuery = {
-  page: 1,
-  limit: DEFAULT_LIMIT,
-  q: "",
-  category: "",
-  sortBy: null,
-  order: "asc",
-};
-
-/**
- * Nonsense in the URL is corrected rather than rejected: ?page=abc reads as
- * page 1, ?limit=17 falls back to the default. The caller replaces the URL with
- * `canonical` so the address bar matches what is on screen without adding a
- * history entry.
- */
 export function parseListQuery(search: URLSearchParams): {
   query: ListQuery;
   canonical: string;

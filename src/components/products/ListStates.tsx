@@ -4,7 +4,6 @@ import type { ApiError } from "@/lib/api-error";
 import { Button } from "@/components/ui/Button";
 import { formatCategory } from "@/lib/format";
 
-/** Skeleton rows mirror the real row height so nothing shifts when data lands. */
 export function TableSkeleton({ rows }: { rows: number }) {
   return (
     <div aria-hidden className="divide-y divide-line">

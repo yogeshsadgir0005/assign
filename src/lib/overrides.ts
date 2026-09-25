@@ -39,9 +39,7 @@ function commit(next: Overrides) {
   state = next;
   try {
     window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-  } catch {
-    // Storage is a convenience here; the in-memory copy still works.
-  }
+  } catch {}
   listeners.forEach((listener) => listener());
 }
 
@@ -105,7 +103,6 @@ export function findLocalProduct(overrides: Overrides, id: number) {
   return overrides.created.find((product) => product.id === id) ?? null;
 }
 
-/** Merge local writes over one page of API results. */
 export function mergePage(
   products: Product[],
   overrides: Overrides,
@@ -115,8 +112,6 @@ export function mergePage(
     .filter((product) => !overrides.deleted.includes(product.id))
     .map((product) => {
       const edited = overrides.updated[product.id];
-      // The list endpoint returns a narrow field set; keep those fields and
-      // overlay only what the form can change.
       return edited ? { ...product, ...edited } : product;
     });
 

@@ -23,10 +23,10 @@ export function StockValue({ stock }: { stock: number }) {
   return <span className={`num ${tone}`}>{stock}</span>;
 }
 
-export function LocalTag({ label = "Local" }: { label?: string }) {
+export function LocalTag() {
   return (
     <span className="ml-1.5 border border-line-strong bg-sunken px-1 align-middle text-[10px] font-medium tracking-wide text-ink-2 uppercase">
-      {label}
+      Local
     </span>
   );
 }

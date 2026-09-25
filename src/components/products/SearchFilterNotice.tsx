@@ -8,10 +8,6 @@ type Props = {
   onDropFilter: () => void;
 };
 
-/**
- * DummyJSON can search or filter by category, never both. Saying so beats
- * dropping one of them behind the user's back.
- */
 export function SearchFilterNotice({ category, onClearSearch, onDropFilter }: Props) {
   return (
     <p className="border-l-2 border-line-strong bg-sunken py-2 pr-3 pl-2.5 text-[13px] text-ink-2">

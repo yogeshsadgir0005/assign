@@ -13,7 +13,6 @@ type Props = {
   children: ReactNode;
 };
 
-/** Labels stay visible above the control — placeholders are never the label. */
 export function Field({ id, label, error, hint, required, children }: Props) {
   return (
     <div>

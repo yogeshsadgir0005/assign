@@ -4,7 +4,6 @@ import { useEffect } from "react";
 
 export type ToastMessage = { id: number; text: string };
 
-/** Only mutations get a toast — reads confirm themselves by showing data. */
 export function Toast({ message, onDismiss }: { message: ToastMessage; onDismiss: () => void }) {
   useEffect(() => {
     const timer = setTimeout(onDismiss, 6000);

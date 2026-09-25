@@ -7,11 +7,6 @@ type LoginResponse = SessionUser & {
   email: string;
 };
 
-/**
- * The only endpoint that actually checks our token — the product routes are
- * public. The guard calls it once per page load so an expired token signs you
- * out properly instead of lingering until the next write.
- */
 export async function fetchCurrentUser(options: { signal?: AbortSignal } = {}) {
   const { data } = await http.get<SessionUser>("/auth/me", { signal: options.signal });
   return data;

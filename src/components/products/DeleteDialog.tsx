@@ -14,7 +14,6 @@ type Props = {
   onDeleted: (product: Product) => void;
 };
 
-/** Keeps the button label naming the product without wrapping to three lines. */
 function shorten(title: string) {
   return title.length > 28 ? `${title.slice(0, 27).trimEnd()}…` : title;
 }
@@ -22,7 +21,6 @@ function shorten(title: string) {
 export function DeleteDialog({ product, onClose, onDeleted }: Props) {
   const [working, setWorking] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Cancel holds focus: the destructive button shouldn't be one Enter away.
   const cancelRef = useRef<HTMLButtonElement>(null);
 
   async function confirm() {

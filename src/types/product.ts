@@ -17,7 +17,6 @@ export type Product = {
   stock: number;
   brand?: string;
   sku?: string;
-  tags?: string[];
   thumbnail: string;
   images: string[];
   reviews?: Review[];
@@ -39,7 +38,6 @@ export type Category = {
   name: string;
 };
 
-/** The fields our form owns. Everything else on a product is read-only here. */
 export type ProductDraft = {
   title: string;
   category: string;

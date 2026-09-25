@@ -20,8 +20,8 @@ Then open <http://localhost:3000> and sign in with the DummyJSON demo account:
 
 Other scripts: `npm run build`, `npm start`, `npm run lint`.
 
-No environment variables are needed. `NEXT_PUBLIC_API_BASE_URL` can point the app at a different
-host, which is how the failure states were tested against a dead one — see `.env.example`.
+There is nothing to configure: no environment variables, no keys, no database. Deploying is
+importing the repo.
 
 ## What's built
 

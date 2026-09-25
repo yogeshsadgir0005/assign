@@ -35,8 +35,6 @@ export function ProductsScreen() {
     [search],
   );
 
-  // ?delay=2000 is forwarded to every API call so slow, overlapping responses
-  // can be tested the way the brief describes.
   const delay = searchParams.get("delay");
   setArtificialDelay(Number(delay));
 
@@ -67,7 +65,6 @@ export function ProductsScreen() {
     [pathname, router, keepDelay],
   );
 
-  // Tidy junk like ?page=abc without adding a history entry, so Back still works.
   useEffect(() => {
     const target = keepDelay(canonical);
     const current = search ? `?${search}` : "";
@@ -76,7 +73,6 @@ export function ProductsScreen() {
 
   const totalPages = page ? Math.max(1, Math.ceil(page.total / query.limit)) : 1;
 
-  // ?page=999 only becomes wrong once we know how many pages exist.
   useEffect(() => {
     if (status === "ready" && page && query.page > totalPages) {
       navigate({ ...query, page: totalPages }, true);

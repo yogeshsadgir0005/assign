@@ -2,7 +2,6 @@ import Image from "next/image";
 
 type Props = { src?: string; title: string; size: number; className?: string };
 
-/** Products added in-session may have no image; a letter tile beats a broken one. */
 export function Thumb({ src, title, size, className = "" }: Props) {
   const box = `shrink-0 border border-line bg-sunken object-contain ${className}`;
 

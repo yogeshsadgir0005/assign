@@ -22,7 +22,6 @@ export class ApiError extends Error {
     this.status = status;
   }
 
-  /** Retrying only helps when the failure wasn't about what we asked for. */
   get retryable() {
     return this.kind === "offline" || this.kind === "timeout" || this.kind === "server";
   }
@@ -32,7 +31,6 @@ export function isCanceled(error: unknown) {
   return error instanceof ApiError && error.kind === "canceled";
 }
 
-/** Single place that turns any Axios failure into something the UI can phrase. */
 export function toApiError(error: unknown): ApiError {
   if (error instanceof ApiError) return error;
 

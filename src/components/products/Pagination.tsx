@@ -8,7 +8,6 @@ type Props = {
   onChange: (page: number) => void;
 };
 
-/** 1 … 4 5 6 … 20 — never every page number. */
 export function pageWindow(current: number, total: number): (number | "gap")[] {
   if (total <= 7) return Array.from({ length: total }, (_, index) => index + 1);
 

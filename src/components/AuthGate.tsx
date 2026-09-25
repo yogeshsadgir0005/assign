@@ -7,18 +7,11 @@ import { getSession, useSession } from "@/lib/session";
 import type { ApiError } from "@/lib/api-error";
 import { isCanceled } from "@/lib/api-error";
 
-/**
- * Renders children only once a token is present and the API has confirmed it,
- * so the product pages are never painted for someone who can't actually use
- * them. A 401 from the check clears the session in the Axios interceptor,
- * which lands back here as `token === null`.
- */
 export function AuthGate({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { token } = useSession();
   const [confirmed, setConfirmed] = useState(false);
-  // Losing a token mid-session is an expiry; never having one is a plain visit.
   const hadToken = useRef(false);
 
   useEffect(() => {
@@ -47,9 +40,6 @@ export function AuthGate({ children }: { children: ReactNode }) {
       })
       .catch((error: ApiError) => {
         if (!current || isCanceled(error)) return;
-        // A rejected token has already cleared the session, and the effect
-        // above will redirect. Anything else — offline, a 5xx — is the API's
-        // problem, not a reason to lock someone out of a page they can read.
         if (error.kind !== "unauthorized") setConfirmed(true);
       });
 

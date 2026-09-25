@@ -7,7 +7,6 @@ import { ApiError, isCanceled } from "@/lib/api-error";
 import { serializeListQuery } from "@/lib/query";
 
 type Result = {
-  /** Which request this result belongs to. */
   key: string;
   page: ProductPage | null;
   error: ApiError | null;

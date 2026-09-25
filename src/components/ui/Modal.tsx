@@ -6,7 +6,6 @@ type Props = {
   labelledBy: string;
   onClose: () => void;
   children: ReactNode;
-  /** Forms keep their work when the backdrop is clicked; confirmations don't. */
   dismissOnBackdrop?: boolean;
   initialFocus?: RefObject<HTMLElement | null>;
   width?: string;

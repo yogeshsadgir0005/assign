@@ -36,7 +36,6 @@ export function ProductFormDialog({ product, categories, onClose, onSaved }: Pro
   const fieldRefs = useRef<Partial<Record<FieldName, HTMLElement | null>>>({});
 
   const errors = validate(values);
-  // Nothing is marked wrong until the field has been left or the form sent.
   const errorFor = (name: FieldName) =>
     submitted || touched.has(name) ? (errors[name] ?? null) : null;
 
@@ -83,8 +82,6 @@ export function ProductFormDialog({ product, categories, onClose, onSaved }: Pro
     }
   }
 
-  // No initialFocus needed: the title input is the panel's first focusable
-  // element, which is where Modal puts focus by default.
   return (
     <Modal labelledBy={HEADING_ID} onClose={onClose} width="max-w-xl">
       <form onSubmit={onSubmit} noValidate>

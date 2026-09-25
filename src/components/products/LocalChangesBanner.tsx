@@ -11,7 +11,6 @@ function summarise(overrides: Overrides) {
   return parts.join(", ");
 }
 
-/** Says out loud that writes live on this device only. */
 export function LocalChangesBanner({ overrides }: { overrides: Overrides }) {
   if (countOverrides(overrides) === 0) return null;
 

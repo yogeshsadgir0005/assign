@@ -7,11 +7,6 @@ type Props = {
   hiddenLocally: number;
 };
 
-/**
- * Fixed height, so the table never jumps when the count appears. The range
- * comes from the API's own skip and total; local deletions are reported
- * separately rather than quietly changing the number.
- */
 export function ResultsMeta({ page, loading, refreshing, hiddenLocally }: Props) {
   const range =
     page && page.total > 0

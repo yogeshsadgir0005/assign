@@ -20,8 +20,6 @@ function validate(username: string, password: string): Errors {
 export function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
-  // Only ever bounce back inside this app, never to an absolute URL someone
-  // dropped in the query string.
   const requested = params.get("next") ?? "";
   const next = requested.startsWith("/") && !requested.startsWith("//") ? requested : "/products";
   const expired = params.get("reason") === "expired";
@@ -36,7 +34,6 @@ export function LoginForm() {
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
-  // Someone who still holds a token has no business on this page.
   useEffect(() => {
     if (!expired && readToken()) router.replace(next);
   }, [router, next, expired]);

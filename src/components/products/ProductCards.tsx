@@ -26,7 +26,6 @@ export function ProductCards({ products, listSearch, busy, changedIds, onEdit, o
             <div className="flex gap-3">
               <Thumb src={product.thumbnail} title={product.title} size={52} />
               <div className="min-w-0 flex-1">
-                {/* The whole card opens the product; the buttons sit above it. */}
                 <Link href={`/products/${product.id}${listSearch}`} className="font-medium text-ink">
                   <span className="absolute inset-0" aria-hidden />
                   {product.title}

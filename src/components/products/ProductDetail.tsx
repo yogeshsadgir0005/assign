@@ -20,7 +20,6 @@ import { StockValue } from "./ProductTable";
 export function ProductDetail({ rawId }: { rawId: string }) {
   const searchParams = useSearchParams();
   const search = searchParams.toString();
-  // The list's own params travel with the link, so Back restores that view.
   const backHref = `/products${search ? `?${search}` : ""}`;
 
   setArtificialDelay(Number(searchParams.get("delay")));

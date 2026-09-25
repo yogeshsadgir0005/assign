@@ -11,7 +11,6 @@ type Props = {
   errorFor: (name: FieldName) => string | null;
   onChange: (name: FieldName, value: string) => void;
   onBlur: (name: FieldName) => void;
-  /** Filled in here so the dialog can focus the first invalid field on submit. */
   fieldRefs: RefObject<Partial<Record<FieldName, HTMLElement | null>>>;
 };
 
@@ -35,7 +34,6 @@ export function ProductFormFields({
     id: domId(name),
     value: values[name],
     "aria-invalid": Boolean(errorFor(name)),
-    // Points at whichever of the two lines Field is currently rendering.
     "aria-describedby": errorFor(name) ? `${domId(name)}-error` : undefined,
     onChange: (event: { target: { value: string } }) => onChange(name, event.target.value),
     onBlur: () => onBlur(name),

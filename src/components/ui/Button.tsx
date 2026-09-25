@@ -1,6 +1,6 @@
 import type { ComponentPropsWithRef } from "react";
 
-type Variant = "primary" | "secondary" | "ghost" | "danger";
+type Variant = "primary" | "secondary" | "danger";
 
 type Props = ComponentPropsWithRef<"button"> & {
   variant?: Variant;
@@ -16,7 +16,6 @@ const variants: Record<Variant, string> = {
     "border-accent bg-accent text-white hover:bg-accent-hover hover:border-accent-hover",
   secondary:
     "border-line-strong bg-surface text-ink hover:bg-sunken",
-  ghost: "border-transparent bg-transparent text-ink-2 hover:bg-sunken hover:text-ink",
   danger: "border-danger bg-danger text-white hover:bg-danger-hover hover:border-danger-hover",
 };
 

@@ -13,7 +13,6 @@ export type FormValues = {
 export type FieldName = keyof FormValues;
 export type FormErrors = Partial<Record<FieldName, string>>;
 
-/** Submit focuses the first invalid field, which means order matters. */
 export const FIELD_ORDER: FieldName[] = [
   "title",
   "category",

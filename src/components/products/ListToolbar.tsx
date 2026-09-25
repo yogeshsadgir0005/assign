@@ -67,7 +67,6 @@ export function ListToolbar({ query, categories, onChange }: Props) {
           className={`${selectBase} ${query.category ? activeSelect : ""}`}
         >
           <option value="">All categories</option>
-          {/* Until the category list arrives, still show the one in the URL. */}
           {query.category && !categories.some((item) => item.slug === query.category) ? (
             <option value={query.category}>{formatCategory(query.category)}</option>
           ) : null}

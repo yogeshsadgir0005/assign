@@ -3,8 +3,7 @@ import { announceSessionExpired, readToken } from "./session";
 import { toApiError } from "./api-error";
 
 export const http = axios.create({
-  // Overridable so the failure states can be exercised against a dead host.
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://dummyjson.com",
+  baseURL: "https://dummyjson.com",
   timeout: 20000,
 });
 
@@ -34,7 +33,6 @@ http.interceptors.response.use(
   (response) => response,
   (error: unknown) => {
     const apiError = toApiError(error);
-    // An expired token is the one failure every screen handles the same way.
     if (apiError.kind === "unauthorized" && typeof window !== "undefined") {
       announceSessionExpired();
     }
