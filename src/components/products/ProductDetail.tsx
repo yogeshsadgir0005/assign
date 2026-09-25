@@ -1,21 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useProduct } from "@/hooks/useProduct";
 import { useCategories } from "@/hooks/useCategories";
 import { useOverrides } from "@/lib/overrides";
 import { setArtificialDelay } from "@/lib/http";
-import { formatCategory, formatPrice, formatRating, formatReviewDate } from "@/lib/format";
+import { formatCategory, formatPrice, formatRating } from "@/lib/format";
 import { Button } from "@/components/ui/Button";
 import { Toast, type ToastMessage } from "@/components/ui/Toast";
 import { ErrorState } from "./ListStates";
 import { ProductFormDialog } from "./ProductFormDialog";
 import { DeleteDialog } from "./DeleteDialog";
+import { ProductGallery } from "./ProductGallery";
+import { ProductReviews } from "./ProductReviews";
 import { StockValue } from "./ProductTable";
-import { Thumb } from "./Thumb";
 
 export function ProductDetail({ rawId }: { rawId: string }) {
   const searchParams = useSearchParams();
@@ -33,23 +33,15 @@ export function ProductDetail({ rawId }: { rawId: string }) {
   const [editing, setEditing] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [toast, setToast] = useState<ToastMessage | null>(null);
-  const [imageIndex, setImageIndex] = useState(0);
 
-  const isLocallyDeleted = deleted || overrides.deleted.includes(id);
-
-  if (isLocallyDeleted) {
+  if (deleted || overrides.deleted.includes(id)) {
     return (
       <Shell backHref={backHref}>
-        <div className="rounded-sm border border-line bg-surface px-4 py-10 text-center">
-          <p className="text-sm font-semibold text-ink">You deleted this product</p>
-          <p className="mt-1 text-[13px] text-ink-2">
-            Product #{rawId} is hidden for the rest of this session. Clearing local changes on the
-            list brings it back.
-          </p>
-          <Link href={backHref} className="mt-3 inline-block">
-            <Button>Back to products</Button>
-          </Link>
-        </div>
+        <Notice
+          title="You deleted this product"
+          body={`Product #${rawId} is hidden for the rest of this session. Clearing local changes on the list brings it back.`}
+          backHref={backHref}
+        />
       </Shell>
     );
   }
@@ -57,21 +49,17 @@ export function ProductDetail({ rawId }: { rawId: string }) {
   if (status === "error" && error) {
     return (
       <Shell backHref={backHref}>
-        <div className="rounded-sm border border-line bg-surface">
-          {error.kind === "not-found" ? (
-            <div className="px-4 py-10 text-center">
-              <p className="text-sm font-semibold text-ink">Product #{rawId} doesn&apos;t exist</p>
-              <p className="mt-1 text-[13px] text-ink-2">
-                The catalogue has ids 1 to 194. Check the number, or go back to the list.
-              </p>
-              <Link href={backHref} className="mt-3 inline-block">
-                <Button>Back to products</Button>
-              </Link>
-            </div>
-          ) : (
+        {error.kind === "not-found" ? (
+          <Notice
+            title={`Product #${rawId} doesn't exist`}
+            body="The catalogue has ids 1 to 194. Check the number, or go back to the list."
+            backHref={backHref}
+          />
+        ) : (
+          <div className="rounded-sm border border-line bg-surface">
             <ErrorState error={error} onRetry={retry} />
-          )}
-        </div>
+          </div>
+        )}
       </Shell>
     );
   }
@@ -93,8 +81,6 @@ export function ProductDetail({ rawId }: { rawId: string }) {
   }
 
   const images = product.images?.length ? product.images : [product.thumbnail].filter(Boolean);
-  const active = images[Math.min(imageIndex, images.length - 1)];
-  const reviews = product.reviews ?? [];
 
   return (
     <Shell backHref={backHref}>
@@ -124,48 +110,7 @@ export function ProductDetail({ rawId }: { rawId: string }) {
       ) : null}
 
       <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,22rem)_1fr]">
-        <div>
-          <div className="flex aspect-square w-full items-center justify-center border border-line bg-surface p-4">
-            {active ? (
-              <Image
-                src={active}
-                alt={product.title}
-                width={420}
-                height={420}
-                className="max-h-full w-auto object-contain"
-                unoptimized
-              />
-            ) : (
-              <Thumb title={product.title} size={120} />
-            )}
-          </div>
-
-          {images.length > 1 ? (
-            <div className="mt-2 flex flex-wrap gap-2">
-              {images.map((image, index) => (
-                <button
-                  key={image}
-                  type="button"
-                  onClick={() => setImageIndex(index)}
-                  aria-label={`Image ${index + 1} of ${images.length}`}
-                  aria-current={index === imageIndex}
-                  className={`border p-1 ${
-                    index === imageIndex ? "border-accent" : "border-line hover:border-line-strong"
-                  }`}
-                >
-                  <Image
-                    src={image}
-                    alt=""
-                    width={44}
-                    height={44}
-                    className="h-11 w-11 object-contain"
-                    unoptimized
-                  />
-                </button>
-              ))}
-            </div>
-          ) : null}
-        </div>
+        <ProductGallery images={images} title={product.title} />
 
         <div>
           <dl className="grid grid-cols-3 gap-px overflow-hidden rounded-sm border border-line bg-line">
@@ -200,38 +145,15 @@ export function ProductDetail({ rawId }: { rawId: string }) {
           </h2>
           <p className="mt-1.5 max-w-prose text-sm text-ink-2">{product.description}</p>
 
-          {(product.warrantyInformation ?? product.shippingInformation ?? product.returnPolicy) ? (
-            <dl className="mt-5 max-w-prose divide-y divide-line border-t border-line text-sm">
-              <Row label="Warranty" value={product.warrantyInformation} />
-              <Row label="Shipping" value={product.shippingInformation} />
-              <Row label="Returns" value={product.returnPolicy} />
-            </dl>
-          ) : null}
+          <dl className="mt-5 max-w-prose divide-y divide-line border-t border-line text-sm empty:hidden">
+            <Row label="Warranty" value={product.warrantyInformation} />
+            <Row label="Shipping" value={product.shippingInformation} />
+            <Row label="Returns" value={product.returnPolicy} />
+          </dl>
         </div>
       </div>
 
-      <section className="mt-8">
-        <h2 className="text-[13px] font-semibold tracking-wide text-ink-3 uppercase">
-          Reviews ({reviews.length})
-        </h2>
-        {reviews.length === 0 ? (
-          <p className="mt-2 text-sm text-ink-2">No one has reviewed this product yet.</p>
-        ) : (
-          <ul className="mt-2 max-w-3xl divide-y divide-line border-t border-line">
-            {reviews.map((review, index) => (
-              <li key={`${review.reviewerEmail}-${index}`} className="py-3">
-                <div className="flex items-baseline justify-between gap-3">
-                  <p className="text-sm font-medium text-ink">{review.reviewerName}</p>
-                  <p className="num text-[13px] text-ink-3">
-                    {review.rating}/5 · {formatReviewDate(review.date)}
-                  </p>
-                </div>
-                <p className="mt-1 text-sm text-ink-2">{review.comment}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      <ProductReviews reviews={product.reviews ?? []} />
 
       {editing ? (
         <ProductFormDialog
@@ -258,7 +180,7 @@ export function ProductDetail({ rawId }: { rawId: string }) {
   );
 }
 
-function Shell({ backHref, children }: { backHref: string; children: React.ReactNode }) {
+function Shell({ backHref, children }: { backHref: string; children: ReactNode }) {
   return (
     <main className="mx-auto max-w-5xl px-4 py-5 sm:px-6">
       <Link
@@ -272,7 +194,19 @@ function Shell({ backHref, children }: { backHref: string; children: React.React
   );
 }
 
-function Stat({ label, children }: { label: string; children: React.ReactNode }) {
+function Notice({ title, body, backHref }: { title: string; body: string; backHref: string }) {
+  return (
+    <div className="rounded-sm border border-line bg-surface px-4 py-10 text-center">
+      <p className="text-sm font-semibold text-ink">{title}</p>
+      <p className="mx-auto mt-1 max-w-md text-[13px] text-ink-2">{body}</p>
+      <Link href={backHref} className="mt-3 inline-block">
+        <Button>Back to products</Button>
+      </Link>
+    </div>
+  );
+}
+
+function Stat({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="bg-surface px-3 py-2.5">
       <dt className="text-[12px] font-medium tracking-wide text-ink-3 uppercase">{label}</dt>

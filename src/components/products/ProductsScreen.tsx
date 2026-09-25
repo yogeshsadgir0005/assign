@@ -9,7 +9,6 @@ import { useCategories } from "@/hooks/useCategories";
 import { mergePage, useOverrides } from "@/lib/overrides";
 import { parseListQuery, serializeListQuery } from "@/lib/query";
 import { setArtificialDelay } from "@/lib/http";
-import { formatCategory } from "@/lib/format";
 import { Button } from "@/components/ui/Button";
 import { Toast, type ToastMessage } from "@/components/ui/Toast";
 import { ListToolbar } from "./ListToolbar";
@@ -18,6 +17,8 @@ import { ProductCards } from "./ProductCards";
 import { Pagination } from "./Pagination";
 import { EmptyState, ErrorState, TableSkeleton } from "./ListStates";
 import { LocalChangesBanner } from "./LocalChangesBanner";
+import { SearchFilterNotice } from "./SearchFilterNotice";
+import { ResultsMeta } from "./ResultsMeta";
 import { ProductFormDialog } from "./ProductFormDialog";
 import { DeleteDialog } from "./DeleteDialog";
 
@@ -147,42 +148,20 @@ export function ProductsScreen() {
         <ListToolbar query={query} categories={categories} onChange={applyQuery} />
 
         {query.q && query.category ? (
-          <p className="border-l-2 border-line-strong bg-sunken py-2 pr-3 pl-2.5 text-[13px] text-ink-2">
-            Searching the whole catalogue. DummyJSON has no endpoint that searches inside a
-            category, so the {formatCategory(query.category)} filter is paused until the search is
-            cleared.{" "}
-            <button
-              type="button"
-              onClick={() => applyQuery({ ...query, q: "", page: 1 })}
-              className="underline underline-offset-2 hover:text-ink"
-            >
-              Clear search
-            </button>{" "}
-            ·{" "}
-            <button
-              type="button"
-              onClick={() => applyQuery({ ...query, category: "", page: 1 })}
-              className="underline underline-offset-2 hover:text-ink"
-            >
-              Drop the filter
-            </button>
-          </p>
+          <SearchFilterNotice
+            category={query.category}
+            onClearSearch={() => applyQuery({ ...query, q: "", page: 1 })}
+            onDropFilter={() => applyQuery({ ...query, category: "", page: 1 })}
+          />
         ) : null}
       </div>
 
-      <div className="mt-4 flex h-6 items-center justify-between gap-3 text-[13px] text-ink-2">
-        <p aria-live="polite" className="num">
-          {page && page.total > 0
-            ? `Showing ${page.skip + 1}–${page.skip + page.products.length} of ${page.total}`
-            : showSkeleton
-              ? "Loading the catalogue…"
-              : ""}
-          {hiddenHere > 0 ? (
-            <span className="text-ink-3"> · {hiddenHere} hidden by local deletes</span>
-          ) : null}
-        </p>
-        {status === "refreshing" ? <span className="text-ink-3">Updating…</span> : null}
-      </div>
+      <ResultsMeta
+        page={page}
+        loading={showSkeleton}
+        refreshing={status === "refreshing"}
+        hiddenLocally={hiddenHere}
+      />
 
       {status === "error" && page ? (
         <p className="mt-1 mb-2 flex items-center gap-2 border-l-2 border-danger bg-danger-soft py-2 pr-3 pl-2.5 text-[13px] text-ink">

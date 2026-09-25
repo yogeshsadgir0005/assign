@@ -95,7 +95,7 @@ export function ProductTable({
             Id
           </th>
           <SortableHeader field="title" label="Product" query={query} onSort={onSort} className="text-left" />
-          <th scope="col" className={`${headCell} hidden w-40 text-left lg:table-cell`}>
+          <th scope="col" className={`${headCell} hidden w-40 text-left md:table-cell`}>
             Category
           </th>
           <SortableHeader
@@ -152,7 +152,7 @@ export function ProductTable({
                 </div>
               </td>
 
-              <td className="hidden px-3 py-1.5 text-[13px] text-ink-2 lg:table-cell">
+              <td className="hidden px-3 py-1.5 text-[13px] text-ink-2 md:table-cell">
                 {formatCategory(product.category)}
               </td>
               <td className="num px-3 py-1.5 text-right">{formatPrice(product.price)}</td>
